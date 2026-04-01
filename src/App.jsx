@@ -58,6 +58,93 @@ const styles = `
   .fade-lang {
     animation: fadeIn 0.3s ease both;
   }
+
+  /* --- Responsive layout helpers (override inline where needed) --- */
+  .wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 40px;
+    align-items: end;
+  }
+
+  .contactBlock a:hover {
+    color: var(--accent);
+  }
+
+  .skillsGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .projectsGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .featuredCard {
+    grid-column: span 3;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .featuredRight {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 18px;
+    border-left: 1px solid var(--border);
+  }
+
+  .eduGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 900px) {
+    .wrapper { padding: 44px 22px; }
+    .header { gap: 28px; }
+    .featuredRight { padding-left: 14px; }
+  }
+
+  @media (max-width: 720px) {
+    .header {
+      grid-template-columns: 1fr !important;
+      align-items: start !important;
+    }
+    .contactBlock {
+      align-items: flex-start !important;
+      margin-top: 18px;
+    }
+    .skillsGrid { grid-template-columns: repeat(2, 1fr) !important; }
+    .projectsGrid { grid-template-columns: 1fr !important; }
+    .featuredCard { grid-template-columns: 1fr !important; }
+    .featuredRight {
+      border-left: none;
+      padding-left: 0;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+      margin-top: 6px;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .wrapper { padding: 36px 16px; }
+    .skillsGrid { grid-template-columns: 1fr !important; }
+    .eduGrid { grid-template-columns: 1fr !important; }
+  }
 `
 
 // --- Rich text renderer ---
@@ -93,7 +180,7 @@ export default function App() {
 
   const s = {
     // Layout
-    wrapper: { maxWidth: 900, margin: '0 auto', padding: '60px 40px', position: 'relative', zIndex: 1 },
+    wrapper: { position: 'relative', zIndex: 1 },
 
     // Lang toggle
     langToggle: {
@@ -198,6 +285,11 @@ export default function App() {
       borderRadius: 8, padding: 20, textDecoration: 'none', color: 'inherit',
       display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20,
     },
+    featuredRight: {
+      display: 'flex', flexDirection: 'column', justifyContent: 'center',
+      paddingLeft: 18, borderLeft: '1px solid var(--border)',
+    },
+    featuredRightText: { fontSize: 12, color: '#8a8ab0', lineHeight: 1.7 },
     projectCard: {
       background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 8,
       padding: 20, textDecoration: 'none', color: 'inherit',
@@ -261,10 +353,10 @@ export default function App() {
         <button style={s.langBtn(lang === 'en')} onClick={() => setLang('en')}>🇺🇸 EN</button>
       </div>
 
-      <div style={s.wrapper} className="fade-lang" key={lang}>
+      <div style={s.wrapper} className="wrapper fade-lang" key={lang}>
 
         {/* HEADER */}
-        <header style={s.header}>
+        <header style={s.header} className="header">
           <div>
             <div style={s.headerLabel}>
               <span style={s.labelLine} />
@@ -275,7 +367,7 @@ export default function App() {
             </h1>
             <p style={s.tagline}>{t.tagline}</p>
           </div>
-          <div style={s.contactBlock}>
+          <div style={s.contactBlock} className="contactBlock">
             <a href="mailto:erickxavier180@gmail.com" style={s.contactLink}>erickxavier180@gmail.com</a>
             <a href="https://github.com/erickdevz" target="_blank" rel="noreferrer" style={s.contactLink}>github.com/erickdevz</a>
             <a href="https://linkedin.com/in/erickpsx" target="_blank" rel="noreferrer" style={s.contactLink}>linkedin.com/in/erickpsx</a>
@@ -303,7 +395,7 @@ export default function App() {
             <h2 style={s.sectionH2}>{t.sec02}</h2>
             <div style={s.sectionLine} />
           </div>
-          <div style={s.skillsGrid}>
+          <div style={s.skillsGrid} className="skillsGrid">
             {t.skills.map((sk, i) => (
               <div key={i} style={s.skillPill}>
                 <div style={s.skillCat}>{sk.cat}</div>
@@ -345,10 +437,16 @@ export default function App() {
             <h2 style={s.sectionH2}>{t.sec04}</h2>
             <div style={s.sectionLine} />
           </div>
-          <div style={s.projectsGrid}>
+          <div style={s.projectsGrid} className="projectsGrid">
 
             {/* City Explorer — featured */}
-            <a href="https://github.com/erickdevz/city-explorer" target="_blank" rel="noreferrer" style={s.featuredCard}>
+            <a
+              href="https://github.com/erickdevz/city-explorer"
+              target="_blank"
+              rel="noreferrer"
+              style={s.featuredCard}
+              className="featuredCard"
+            >
               <div>
                 <div style={s.projectTag}>{t.featuredTag}</div>
                 <div style={s.projectName}>{t.featuredName}</div>
@@ -359,8 +457,8 @@ export default function App() {
                   ))}
                 </div>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <p style={s.projectDesc}>
+              <div style={s.featuredRight} className="featuredRight">
+                <p style={s.featuredRightText}>
                   <RichText parts={t.featuredDesc2Right} />
                 </p>
               </div>
@@ -400,7 +498,7 @@ export default function App() {
             <h2 style={s.sectionH2}>{t.sec05}</h2>
             <div style={s.sectionLine} />
           </div>
-          <div style={s.eduGrid}>
+          <div style={s.eduGrid} className="eduGrid">
             <div style={s.eduCard}>
               <div style={s.eduLabel}>{t.eduLabel1}</div>
               <div style={s.eduTitle}>{t.eduTitle1}</div>
