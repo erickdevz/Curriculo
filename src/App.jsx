@@ -441,7 +441,7 @@ export default function App() {
 
             {/* City Explorer — featured */}
             <a
-              href="https://github.com/erickdevz/city-explorer"
+              href="https://cityexploreratk.vercel.app/"
               target="_blank"
               rel="noreferrer"
               style={s.featuredCard}
