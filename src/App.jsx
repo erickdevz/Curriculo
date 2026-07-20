@@ -109,14 +109,26 @@ const styles = `
 
   .eduGrid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 16px;
+  }
+
+  .automateGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .ctaRow a:hover,
+  .ctaRow a:focus-visible {
+    opacity: 0.85;
   }
 
   @media (max-width: 900px) {
     .wrapper { padding: 44px 22px; }
     .header { gap: 28px; }
     .featuredRight { padding-left: 14px; }
+    .automateGrid { grid-template-columns: 1fr !important; }
   }
 
   @media (max-width: 720px) {
@@ -228,6 +240,26 @@ export default function App() {
       transition: 'color 0.2s',
     },
 
+    // Availability + CTAs
+    availability: {
+      marginTop: 18, display: 'flex', alignItems: 'center', gap: 8,
+      fontFamily: "'Space Mono', monospace", fontSize: 11, letterSpacing: 1,
+      color: 'var(--accent)',
+    },
+    availabilityDot: {
+      width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)',
+      boxShadow: '0 0 8px var(--accent)', flexShrink: 0,
+    },
+    ctaRow: { display: 'flex', gap: 12, marginTop: 24, flexWrap: 'wrap' },
+    ctaBase: {
+      fontFamily: "'Space Mono', monospace", fontSize: 11, letterSpacing: 1,
+      textTransform: 'uppercase', padding: '13px 22px', borderRadius: 6,
+      textDecoration: 'none', border: '1px solid var(--accent)',
+      transition: 'opacity 0.2s',
+    },
+    ctaPrimary: { background: 'var(--accent)', color: '#04140c', fontWeight: 700 },
+    ctaSecondary: { background: 'transparent', color: 'var(--accent)' },
+
     // Section
     section: (delay) => ({ marginBottom: 52, animation: `fadeUp 0.8s ease ${delay}s both` }),
     sectionHeader: { display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28 },
@@ -257,6 +289,7 @@ export default function App() {
     skillItems: { fontSize: 12, color: '#9090a8', lineHeight: 1.5 },
 
     // Job
+    jobList: { display: 'flex', flexDirection: 'column', gap: 16 },
     jobCard: {
       background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 8,
       padding: '24px 28px', position: 'relative', overflow: 'hidden',
@@ -264,7 +297,7 @@ export default function App() {
     jobBar: {
       position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, background: 'var(--accent)',
     },
-    jobMeta: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 },
+    jobMeta: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6, gap: 12 },
     jobCompany: { fontSize: 16, fontWeight: 700, color: 'var(--text)' },
     jobDate: {
       fontFamily: "'Space Mono', monospace", fontSize: 10, color: 'var(--muted)',
@@ -272,11 +305,32 @@ export default function App() {
     },
     jobRole: {
       fontFamily: "'Space Mono', monospace", fontSize: 10, color: 'var(--accent)',
-      letterSpacing: 2, textTransform: 'uppercase', marginBottom: 14,
+      letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4,
+    },
+    jobLocation: {
+      fontFamily: "'Space Mono', monospace", fontSize: 10, color: 'var(--muted)',
+      marginBottom: 14,
     },
     bulletList: { listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 },
     bulletItem: { fontSize: 13, color: '#9090a8', lineHeight: 1.5, paddingLeft: 16, position: 'relative' },
     bulletDot: { position: 'absolute', left: 0, color: 'var(--accent)', fontWeight: 700 },
+
+    // What I automate
+    automateGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 },
+    automateCard: {
+      background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 8,
+      padding: '22px 20px', display: 'flex', flexDirection: 'column', gap: 12,
+      position: 'relative', overflow: 'hidden',
+    },
+    automateBar: {
+      position: 'absolute', left: 0, right: 0, top: 0, height: 3, background: 'var(--accent2)',
+    },
+    automateLabel: (color) => ({
+      fontFamily: "'Space Mono', monospace", fontSize: 9, letterSpacing: 3,
+      textTransform: 'uppercase', color, marginBottom: 2,
+    }),
+    automateText: { fontSize: 13, color: '#a0a0c0', lineHeight: 1.5 },
+    automateResultText: { fontSize: 13, color: 'var(--text)', lineHeight: 1.5, fontWeight: 600 },
 
     // Projects
     projectsGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 },
@@ -366,6 +420,14 @@ export default function App() {
               ERICK<span style={s.h1span}>XAVIER</span>
             </h1>
             <p style={s.tagline}>{t.tagline}</p>
+            <p style={s.availability}>
+              <span style={s.availabilityDot} aria-hidden="true" />
+              {t.availability}
+            </p>
+            <div style={s.ctaRow} className="ctaRow">
+              <a href="#projetos" style={{ ...s.ctaBase, ...s.ctaPrimary }}>{t.ctaProjects}</a>
+              <a href="/curriculo-erick-xavier.pdf" download style={{ ...s.ctaBase, ...s.ctaSecondary }}>{t.ctaResume}</a>
+            </div>
           </div>
           <div style={s.contactBlock} className="contactBlock">
             <a href="mailto:erickxavier180@gmail.com" style={s.contactLink}>erickxavier180@gmail.com</a>
@@ -388,10 +450,38 @@ export default function App() {
           </p>
         </section>
 
-        {/* SKILLS */}
+        {/* WHAT I AUTOMATE */}
         <section style={s.section(0.2)}>
           <div style={s.sectionHeader}>
             <span style={s.sectionNum}>02</span>
+            <h2 style={s.sectionH2}>{t.secAuto}</h2>
+            <div style={s.sectionLine} />
+          </div>
+          <div style={s.automateGrid} className="automateGrid">
+            {t.automations.map((a, i) => (
+              <div key={i} style={s.automateCard}>
+                <div style={s.automateBar} />
+                <div>
+                  <div style={s.automateLabel('var(--muted)')}>{t.labelProblem}</div>
+                  <p style={s.automateText}>{a.problem}</p>
+                </div>
+                <div>
+                  <div style={s.automateLabel('var(--accent3)')}>{t.labelSolution}</div>
+                  <p style={s.automateText}>{a.solution}</p>
+                </div>
+                <div>
+                  <div style={s.automateLabel('var(--accent)')}>{t.labelResult}</div>
+                  <p style={s.automateResultText}>{a.result}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* SKILLS */}
+        <section style={s.section(0.3)}>
+          <div style={s.sectionHeader}>
+            <span style={s.sectionNum}>03</span>
             <h2 style={s.sectionH2}>{t.sec02}</h2>
             <div style={s.sectionLine} />
           </div>
@@ -406,34 +496,39 @@ export default function App() {
         </section>
 
         {/* EXPERIENCE */}
-        <section style={s.section(0.3)}>
+        <section style={s.section(0.4)}>
           <div style={s.sectionHeader}>
-            <span style={s.sectionNum}>03</span>
+            <span style={s.sectionNum}>04</span>
             <h2 style={s.sectionH2}>{t.sec03}</h2>
             <div style={s.sectionLine} />
           </div>
-          <div style={s.jobCard}>
-            <div style={s.jobBar} />
-            <div style={s.jobMeta}>
-              <div style={s.jobCompany}>{t.jobCompany}</div>
-              <div style={s.jobDate}>{t.jobDate}</div>
-            </div>
-            <div style={s.jobRole}>{t.jobRole}</div>
-            <ul style={s.bulletList}>
-              {t.jobBullets.map((b, i) => (
-                <li key={i} style={s.bulletItem}>
-                  <span style={s.bulletDot}>›</span>
-                  {b.pre}<strong style={{ color: 'var(--text)' }}>{b.bold}</strong>{b.post}
-                </li>
-              ))}
-            </ul>
+          <div style={s.jobList}>
+            {t.jobs.map((job, i) => (
+              <div key={i} style={s.jobCard}>
+                <div style={s.jobBar} />
+                <div style={s.jobMeta}>
+                  <div style={s.jobCompany}>{job.company}</div>
+                  <div style={s.jobDate}>{job.date}</div>
+                </div>
+                <div style={s.jobRole}>{job.role}</div>
+                <div style={s.jobLocation}>{job.location}</div>
+                <ul style={s.bulletList}>
+                  {job.bullets.map((b, bi) => (
+                    <li key={bi} style={s.bulletItem}>
+                      <span style={s.bulletDot}>›</span>
+                      {b.pre}<strong style={{ color: 'var(--text)' }}>{b.bold}</strong>{b.post}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </section>
 
         {/* PROJECTS */}
-        <section style={s.section(0.4)}>
+        <section style={s.section(0.5)} id="projetos">
           <div style={s.sectionHeader}>
-            <span style={s.sectionNum}>04</span>
+            <span style={s.sectionNum}>05</span>
             <h2 style={s.sectionH2}>{t.sec04}</h2>
             <div style={s.sectionLine} />
           </div>
@@ -492,9 +587,9 @@ export default function App() {
         </section>
 
         {/* EDUCATION */}
-        <section style={s.section(0.5)}>
+        <section style={s.section(0.6)}>
           <div style={s.sectionHeader}>
-            <span style={s.sectionNum}>05</span>
+            <span style={s.sectionNum}>06</span>
             <h2 style={s.sectionH2}>{t.sec05}</h2>
             <div style={s.sectionLine} />
           </div>
@@ -508,6 +603,11 @@ export default function App() {
               <div style={s.eduLabel}>{t.eduLabel2}</div>
               <div style={s.eduTitle}>{t.eduTitle2}</div>
               <div style={s.eduSub}>{t.eduSub2}</div>
+            </div>
+            <div style={s.eduCard}>
+              <div style={s.eduLabel}>{t.eduLabel3}</div>
+              <div style={s.eduTitle}>{t.eduTitle3}</div>
+              <div style={s.eduSub}>{t.eduSub3}</div>
             </div>
           </div>
         </section>
