@@ -1,5 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import translations from './i18n'
+import { projects } from './projects'
+import ProjectCard from './ProjectCard'
 
 const styles = `
   :root {
@@ -91,22 +93,6 @@ const styles = `
     gap: 16px;
   }
 
-  .featuredCard {
-    grid-column: span 3;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    align-items: start;
-  }
-
-  .featuredRight {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding-left: 18px;
-    border-left: 1px solid var(--border);
-  }
-
   .eduGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -127,7 +113,6 @@ const styles = `
   @media (max-width: 900px) {
     .wrapper { padding: 44px 22px; }
     .header { gap: 28px; }
-    .featuredRight { padding-left: 14px; }
     .automateGrid { grid-template-columns: 1fr !important; }
   }
 
@@ -142,14 +127,6 @@ const styles = `
     }
     .skillsGrid { grid-template-columns: repeat(2, 1fr) !important; }
     .projectsGrid { grid-template-columns: 1fr !important; }
-    .featuredCard { grid-template-columns: 1fr !important; }
-    .featuredRight {
-      border-left: none;
-      padding-left: 0;
-      border-top: 1px solid var(--border);
-      padding-top: 14px;
-      margin-top: 6px;
-    }
   }
 
   @media (max-width: 520px) {
@@ -175,7 +152,19 @@ function RichText({ parts, style }) {
 export default function App() {
   const [lang, setLang] = useState('pt')
   const [mouse, setMouse] = useState({ x: -999, y: -999 })
+  const [techFilter, setTechFilter] = useState(null)
   const t = translations[lang]
+
+  const allTechs = useMemo(() => {
+    const set = new Set()
+    projects.forEach(p => p.stack.forEach(tech => set.add(tech)))
+    return Array.from(set).sort()
+  }, [])
+
+  const filteredProjects = useMemo(() => {
+    if (!techFilter) return projects
+    return projects.filter(p => p.stack.includes(techFilter))
+  }, [techFilter])
 
   useEffect(() => {
     const el = document.createElement('style')
@@ -334,36 +323,18 @@ export default function App() {
 
     // Projects
     projectsGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 },
-    featuredCard: {
-      gridColumn: 'span 3', background: 'var(--card)', border: '1px solid var(--border)',
-      borderRadius: 8, padding: 20, textDecoration: 'none', color: 'inherit',
-      display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20,
-    },
-    featuredRight: {
-      display: 'flex', flexDirection: 'column', justifyContent: 'center',
-      paddingLeft: 18, borderLeft: '1px solid var(--border)',
-    },
-    featuredRightText: { fontSize: 12, color: '#8a8ab0', lineHeight: 1.7 },
-    projectCard: {
-      background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 8,
-      padding: 20, textDecoration: 'none', color: 'inherit',
-      display: 'flex', flexDirection: 'column', gap: 10,
-    },
-    projectTag: {
-      fontFamily: "'Space Mono', monospace", fontSize: 8, letterSpacing: 3,
-      textTransform: 'uppercase', color: 'var(--accent2)', marginBottom: 4,
-    },
-    projectName: { fontSize: 15, fontWeight: 700, color: 'var(--text)', lineHeight: 1.2, marginBottom: 4 },
-    projectDesc: { fontSize: 12, color: '#7878a0', lineHeight: 1.5 },
-    techTags: { display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 6 },
-    techTag: {
-      fontFamily: "'Space Mono', monospace", fontSize: 9, color: 'var(--accent)',
-      background: 'rgba(0,255,136,0.08)', border: '1px solid rgba(0,255,136,0.2)',
-      padding: '2px 8px', borderRadius: 3,
-    },
+    filterRow: { display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 },
+    filterChip: (active) => ({
+      fontFamily: "'Space Mono', monospace", fontSize: 10, letterSpacing: 1,
+      textTransform: 'uppercase', padding: '6px 14px', borderRadius: 20,
+      border: active ? '1px solid var(--accent)' : '1px solid var(--border)',
+      background: active ? 'rgba(0,255,136,0.1)' : 'transparent',
+      color: active ? 'var(--accent)' : 'var(--muted)',
+      cursor: 'pointer', transition: 'all 0.2s',
+    }),
 
     // Education
-    eduGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 },
+    eduGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 },
     eduCard: { background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 8, padding: 20 },
     eduLabel: {
       fontFamily: "'Space Mono', monospace", fontSize: 8, letterSpacing: 3,
@@ -532,57 +503,42 @@ export default function App() {
             <h2 style={s.sectionH2}>{t.sec04}</h2>
             <div style={s.sectionLine} />
           </div>
-          <div style={s.projectsGrid} className="projectsGrid">
 
-            {/* City Explorer — featured */}
-            <a
-              href="https://cityexploreratk.vercel.app/"
-              target="_blank"
-              rel="noreferrer"
-              style={s.featuredCard}
-              className="featuredCard"
+          <div style={s.filterRow} role="group" aria-label={t.projectsFilterAll}>
+            <button
+              style={s.filterChip(techFilter === null)}
+              onClick={() => setTechFilter(null)}
+              aria-pressed={techFilter === null}
             >
-              <div>
-                <div style={s.projectTag}>{t.featuredTag}</div>
-                <div style={s.projectName}>{t.featuredName}</div>
-                <p style={s.projectDesc}>{t.featuredDesc1}</p>
-                <div style={s.techTags}>
-                  {['React', 'Next.js', 'Leaflet.js', 'PostgreSQL', 'PostGIS', 'REST APIs'].map(tech => (
-                    <span key={tech} style={s.techTag}>{tech}</span>
-                  ))}
-                </div>
-              </div>
-              <div style={s.featuredRight} className="featuredRight">
-                <p style={s.featuredRightText}>
-                  <RichText parts={t.featuredDesc2Right} />
-                </p>
-              </div>
-            </a>
+              {t.projectsFilterAll}
+            </button>
+            {allTechs.map(tech => (
+              <button
+                key={tech}
+                style={s.filterChip(techFilter === tech)}
+                onClick={() => setTechFilter(tech)}
+                aria-pressed={techFilter === tech}
+              >
+                {tech}
+              </button>
+            ))}
+          </div>
 
-            {/* Syncro */}
-            <a href="https://github.com/erickdevz/syncro" target="_blank" rel="noreferrer" style={s.projectCard}>
-              <div style={s.projectTag}>{t.proj1Tag}</div>
-              <div style={s.projectName}>{t.proj1Name}</div>
-              <p style={s.projectDesc}>{t.proj1Desc}</p>
-              <div style={s.techTags}>
-                {['Spring Boot', 'JWT', 'Docker', 'Flyway'].map(tech => (
-                  <span key={tech} style={s.techTag}>{tech}</span>
-                ))}
-              </div>
-            </a>
-
-            {/* Assistência Técnica */}
-            <a href="https://github.com/erickdevz/assistencia-tecnica" target="_blank" rel="noreferrer" style={s.projectCard}>
-              <div style={s.projectTag}>{t.proj2Tag}</div>
-              <div style={s.projectName}>{t.proj2Name}</div>
-              <p style={s.projectDesc}>{t.proj2Desc}</p>
-              <div style={s.techTags}>
-                {['Spring Boot', 'PostgreSQL', 'Swagger', 'Docker'].map(tech => (
-                  <span key={tech} style={s.techTag}>{tech}</span>
-                ))}
-              </div>
-            </a>
-
+          <div style={s.projectsGrid} className="projectsGrid">
+            {filteredProjects.map(project => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                lang={lang}
+                labels={{
+                  problem: t.labelProblem,
+                  result: t.labelResult,
+                  repo: t.projectLabelRepo,
+                  demo: t.projectLabelDemo,
+                  automationBadge: t.projectAutomationBadge,
+                }}
+              />
+            ))}
           </div>
         </section>
 
@@ -603,11 +559,6 @@ export default function App() {
               <div style={s.eduLabel}>{t.eduLabel2}</div>
               <div style={s.eduTitle}>{t.eduTitle2}</div>
               <div style={s.eduSub}>{t.eduSub2}</div>
-            </div>
-            <div style={s.eduCard}>
-              <div style={s.eduLabel}>{t.eduLabel3}</div>
-              <div style={s.eduTitle}>{t.eduTitle3}</div>
-              <div style={s.eduSub}>{t.eduSub3}</div>
             </div>
           </div>
         </section>
